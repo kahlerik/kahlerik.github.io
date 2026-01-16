@@ -3,6 +3,72 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import * as Switch from '@radix-ui/react-switch'
 import * as Separator from '@radix-ui/react-separator'
 
+// Translations for English and Argentine Spanish
+const TRANSLATIONS = {
+  en: {
+    title: 'Refrigeration Case Controller',
+    subtitle: 'Live Monitoring Dashboard',
+    language: 'Language',
+    pauseUpdates: 'Pause Updates',
+    updatesEvery: 'Updates every 5s',
+    caseTemperature: 'Case Temperature',
+    suctionTemp: 'Suction Temp',
+    dischargeTemp: 'Discharge Temp',
+    evaporatorTemp: 'Evaporator Temp',
+    txValvePosition: 'TX Valve Position',
+    txValveSuperheat: 'TX Valve Superheat',
+    analogSignals: 'Analog Signals - Time Series',
+    digitalSignals: 'Digital Signals - System Status',
+    yAxisLabel: 'Temperature (°F) / Position (%)',
+    caseTempChart: 'Case Temp (°F)',
+    suctionTempChart: 'Suction Temp (°F)',
+    dischargeTempChart: 'Discharge Temp (°F)',
+    evaporatorTempChart: 'Evaporator Temp (°F)',
+    txValvePositionChart: 'TX Valve Position (%)',
+    txSuperheatChart: 'TX Superheat (°F)',
+    defrostMode: 'Defrost Mode',
+    compressor: 'Compressor',
+    evaporatorFan: 'Evaporator Fan',
+    caseLight: 'Case Light',
+    doorSwitch: 'Door Switch',
+    alarmStatus: 'Alarm Status',
+    on: 'ON',
+    off: 'OFF',
+    footer: 'Refrigeration Case Controller v1.0 | Simulated Data Stream',
+  },
+  es: {
+    title: 'Controlador de Cámara Frigorífica',
+    subtitle: 'Panel de Monitoreo en Vivo',
+    language: 'Idioma',
+    pauseUpdates: 'Pausar Actualizaciones',
+    updatesEvery: 'Actualiza cada 5s',
+    caseTemperature: 'Temperatura de Cámara',
+    suctionTemp: 'Temp. de Succión',
+    dischargeTemp: 'Temp. de Descarga',
+    evaporatorTemp: 'Temp. de Evaporador',
+    txValvePosition: 'Posición Válvula TX',
+    txValveSuperheat: 'Sobrecalentamiento TX',
+    analogSignals: 'Señales Analógicas - Series Temporales',
+    digitalSignals: 'Señales Digitales - Estado del Sistema',
+    yAxisLabel: 'Temperatura (°F) / Posición (%)',
+    caseTempChart: 'Temp. Cámara (°F)',
+    suctionTempChart: 'Temp. Succión (°F)',
+    dischargeTempChart: 'Temp. Descarga (°F)',
+    evaporatorTempChart: 'Temp. Evaporador (°F)',
+    txValvePositionChart: 'Posición Válvula TX (%)',
+    txSuperheatChart: 'Sobrecalentamiento TX (°F)',
+    defrostMode: 'Modo Descongelación',
+    compressor: 'Compresor',
+    evaporatorFan: 'Ventilador Evaporador',
+    caseLight: 'Luz de Cámara',
+    doorSwitch: 'Interruptor Puerta',
+    alarmStatus: 'Estado de Alarma',
+    on: 'ENCENDIDO',
+    off: 'APAGADO',
+    footer: 'Controlador de Cámara Frigorífica v1.0 | Flujo de Datos Simulados',
+  },
+}
+
 // Simulation parameters for realistic refrigeration data
 const SIMULATION_CONFIG = {
   caseTemp: { baseline: 35, variance: 2, min: 32, max: 40 },
@@ -48,6 +114,9 @@ const RefrigerationDashboard = () => {
     txValveSuperheat: 8,
   })
   const [isPaused, setIsPaused] = useState(false)
+  const [language, setLanguage] = useState('en')
+
+  const t = TRANSLATIONS[language]
 
   // Initialize data with some history
   useEffect(() => {
@@ -118,6 +187,29 @@ const RefrigerationDashboard = () => {
     return () => clearInterval(interval)
   }, [isPaused, currentValues, binaryStates])
 
+  // Custom tooltip formatter to round values to 1 decimal place
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{
+          backgroundColor: '#1f2937',
+          border: '1px solid #374151',
+          borderRadius: '8px',
+          padding: '12px',
+          color: '#f3f4f6'
+        }}>
+          <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} style={{ color: entry.color, margin: '4px 0' }}>
+              {entry.name}: {entry.value.toFixed(1)}
+            </p>
+          ))}
+        </div>
+      )
+    }
+    return null
+  }
+
   const BinaryIndicator = ({ label, active, color = 'blue' }) => {
     const colors = {
       blue: 'bg-blue-500',
@@ -132,7 +224,7 @@ const RefrigerationDashboard = () => {
       <div className="binary-indicator">
         <div className={`indicator-light ${active ? colors[color] : 'bg-gray-400'} ${active ? 'active' : ''}`} />
         <span className="indicator-label">{label}</span>
-        <span className="indicator-status">{active ? 'ON' : 'OFF'}</span>
+        <span className="indicator-status">{active ? t.on : t.off}</span>
       </div>
     )
   }
@@ -150,12 +242,29 @@ const RefrigerationDashboard = () => {
     <div className="dashboard">
       <header className="dashboard-header">
         <div>
-          <h1>Refrigeration Case Controller</h1>
-          <p className="subtitle">Live Monitoring Dashboard</p>
+          <h1>{t.title}</h1>
+          <p className="subtitle">{t.subtitle}</p>
         </div>
         <div className="header-controls">
+          <label className="language-control">
+            <span>{t.language}:</span>
+            <div className="language-buttons">
+              <button
+                className={`language-btn ${language === 'en' ? 'active' : ''}`}
+                onClick={() => setLanguage('en')}
+              >
+                English
+              </button>
+              <button
+                className={`language-btn ${language === 'es' ? 'active' : ''}`}
+                onClick={() => setLanguage('es')}
+              >
+                Español
+              </button>
+            </div>
+          </label>
           <label className="pause-control">
-            <span>Pause Updates</span>
+            <span>{t.pauseUpdates}</span>
             <Switch.Root
               className="switch-root"
               checked={isPaused}
@@ -166,44 +275,44 @@ const RefrigerationDashboard = () => {
           </label>
           <div className="update-indicator">
             {!isPaused && <div className="pulse" />}
-            <span>Updates every 5s</span>
+            <span>{t.updatesEvery}</span>
           </div>
         </div>
       </header>
 
       <div className="metrics-grid">
         <MetricCard
-          label="Case Temperature"
+          label={t.caseTemperature}
           value={currentValues.caseTemp}
           unit="°F"
           color="#3b82f6"
         />
         <MetricCard
-          label="Suction Temp"
+          label={t.suctionTemp}
           value={currentValues.suctionTemp}
           unit="°F"
           color="#06b6d4"
         />
         <MetricCard
-          label="Discharge Temp"
+          label={t.dischargeTemp}
           value={currentValues.dischargeTemp}
           unit="°F"
           color="#ef4444"
         />
         <MetricCard
-          label="Evaporator Temp"
+          label={t.evaporatorTemp}
           value={currentValues.evaporatorTemp}
           unit="°F"
           color="#8b5cf6"
         />
         <MetricCard
-          label="TX Valve Position"
+          label={t.txValvePosition}
           value={currentValues.txValvePosition}
           unit="%"
           color="#10b981"
         />
         <MetricCard
-          label="TX Valve Superheat"
+          label={t.txValveSuperheat}
           value={currentValues.txValveSuperheat}
           unit="°F"
           color="#f59e0b"
@@ -213,7 +322,7 @@ const RefrigerationDashboard = () => {
       <Separator.Root className="separator" />
 
       <div className="chart-section">
-        <h2>Analog Signals - Time Series</h2>
+        <h2>{t.analogSignals}</h2>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -225,16 +334,9 @@ const RefrigerationDashboard = () => {
             <YAxis
               stroke="#9ca3af"
               tick={{ fill: '#9ca3af' }}
-              label={{ value: 'Temperature (°F) / Position (%)', angle: -90, position: 'insideLeft', fill: '#9ca3af' }}
+              label={{ value: t.yAxisLabel, angle: -90, position: 'insideLeft', fill: '#9ca3af' }}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1f2937',
-                border: '1px solid #374151',
-                borderRadius: '8px',
-                color: '#f3f4f6'
-              }}
-            />
+            <Tooltip content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ color: '#f3f4f6' }}
             />
@@ -242,7 +344,7 @@ const RefrigerationDashboard = () => {
               type="monotone"
               dataKey="caseTemp"
               stroke="#3b82f6"
-              name="Case Temp (°F)"
+              name={t.caseTempChart}
               strokeWidth={2}
               dot={false}
             />
@@ -250,7 +352,7 @@ const RefrigerationDashboard = () => {
               type="monotone"
               dataKey="suctionTemp"
               stroke="#06b6d4"
-              name="Suction Temp (°F)"
+              name={t.suctionTempChart}
               strokeWidth={2}
               dot={false}
             />
@@ -258,7 +360,7 @@ const RefrigerationDashboard = () => {
               type="monotone"
               dataKey="dischargeTemp"
               stroke="#ef4444"
-              name="Discharge Temp (°F)"
+              name={t.dischargeTempChart}
               strokeWidth={2}
               dot={false}
             />
@@ -266,7 +368,7 @@ const RefrigerationDashboard = () => {
               type="monotone"
               dataKey="evaporatorTemp"
               stroke="#8b5cf6"
-              name="Evaporator Temp (°F)"
+              name={t.evaporatorTempChart}
               strokeWidth={2}
               dot={false}
             />
@@ -274,7 +376,7 @@ const RefrigerationDashboard = () => {
               type="monotone"
               dataKey="txValvePosition"
               stroke="#10b981"
-              name="TX Valve Position (%)"
+              name={t.txValvePositionChart}
               strokeWidth={2}
               dot={false}
             />
@@ -282,7 +384,7 @@ const RefrigerationDashboard = () => {
               type="monotone"
               dataKey="txValveSuperheat"
               stroke="#f59e0b"
-              name="TX Superheat (°F)"
+              name={t.txSuperheatChart}
               strokeWidth={2}
               dot={false}
             />
@@ -293,35 +395,35 @@ const RefrigerationDashboard = () => {
       <Separator.Root className="separator" />
 
       <div className="binary-section">
-        <h2>Digital Signals - System Status</h2>
+        <h2>{t.digitalSignals}</h2>
         <div className="binary-grid">
           <BinaryIndicator
-            label="Defrost Mode"
+            label={t.defrostMode}
             active={binaryStates.defrostMode}
             color="orange"
           />
           <BinaryIndicator
-            label="Compressor"
+            label={t.compressor}
             active={binaryStates.compressorRunning}
             color="green"
           />
           <BinaryIndicator
-            label="Evaporator Fan"
+            label={t.evaporatorFan}
             active={binaryStates.evaporatorFan}
             color="blue"
           />
           <BinaryIndicator
-            label="Case Light"
+            label={t.caseLight}
             active={binaryStates.caseLight}
             color="yellow"
           />
           <BinaryIndicator
-            label="Door Switch"
+            label={t.doorSwitch}
             active={binaryStates.doorSwitch}
             color="purple"
           />
           <BinaryIndicator
-            label="Alarm Status"
+            label={t.alarmStatus}
             active={binaryStates.alarmStatus}
             color="red"
           />
@@ -329,7 +431,7 @@ const RefrigerationDashboard = () => {
       </div>
 
       <footer className="dashboard-footer">
-        <p>Refrigeration Case Controller v1.0 | Simulated Data Stream</p>
+        <p>{t.footer}</p>
       </footer>
     </div>
   )
