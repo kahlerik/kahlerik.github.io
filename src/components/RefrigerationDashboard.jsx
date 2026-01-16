@@ -34,7 +34,7 @@ const TRANSLATIONS = {
     alarmStatus: 'Alarm Status',
     on: 'ON',
     off: 'OFF',
-    footer: 'Refrigeration Case Controller v1.0 | Simulated Data Stream',
+    footer: 'Refrigeration Case Controller v1.1 | Simulated Data Stream',
   },
   es: {
     title: 'Controlador de Cámara Frigorífica',
@@ -65,7 +65,7 @@ const TRANSLATIONS = {
     alarmStatus: 'Estado de Alarma',
     on: 'ENCENDIDO',
     off: 'APAGADO',
-    footer: 'Controlador de Cámara Frigorífica v1.0 | Flujo de Datos Simulados',
+    footer: 'Controlador de Cámara Frigorífica v1.1 | Flujo de Datos Simulados',
   },
 }
 
